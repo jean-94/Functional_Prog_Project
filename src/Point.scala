@@ -1,18 +1,43 @@
-case class Point(val x: Float, val y: Float, val z: Option[Float] = None) {
+import scala.annotation.tailrec
+import scala.io.Source
 
-}
+case class Point private(x: Float, y: Float, z: Option[Float] = None) {}
 
 object Point {
-  def deserialisation(info: String): Option[Point] = {
+  def newPoint(x: Float, y: Float): Point = Point(x,y)
+  def newPoint(x: Float, y: Float, z: Float): Point = Point(x,y,Some(z))
 
-    val pattern = """^[-+]?[0-9]+.?[0-9]*\;[-+]?[0-9]+.?[0-9]*\;?[-+]?[0-9]+.?[0-9]*$""".r
-
-    info match {
-      case pattern(_*) if (info.split(";").length == 2) => Some(new Point(info.split(";")(0).toFloat, info.split(";")(1).toFloat))
-      case pattern(_*) if (info.split(";").length == 3) => Some(new Point(info.split(";")(0).toFloat, info.split(";")(1).toFloat, info.split(";")(2).toFloatOption))
+  def deserialization(line: String,sep: String = ","): Option[Point] = {
+    val pattern2 = ("""^[+-]?[0-9]+\.?[0-9]*\""" +
+      sep + """[+-]?[0-9]+\.?[0-9]*$""").r
+    val pattern3 = ("""^[+-]?[0-9]+\.?[0-9]*\""" +
+      sep + """[+-]?[0-9]+\.?[0-9]*\""" +
+      sep + """[+-]?[0-9]+\.?[0-9]*$""").r
+    line match {
+      case pattern2() => Some(newPoint(
+        line.split(sep)(0).toFloat,
+        line.split(sep)(1).toFloat
+      ))
+      case pattern3() => Some(newPoint(
+        line.split(sep)(0).toFloat,
+        line.split(sep)(1).toFloat,
+        line.split(sep)(2).toFloat
+      ))
       case _ => None
     }
-
   }
 
+  def read_csv(path : String, sep: String = ","): List[Option[Point]] ={
+    val source = Source.fromFile(path)
+    val fileContents = source.getLines.toList
+    source.close
+
+    @tailrec
+    def read_csv_aux(lines: List[String], acc: List[Option[Point]] = Nil): List[Option[Point]] = lines match{
+      case Nil => acc
+      case h::t => read_csv_aux(t,deserialization(h,sep)::acc)
+    }
+
+    read_csv_aux(fileContents).reverse
+  }
 }
