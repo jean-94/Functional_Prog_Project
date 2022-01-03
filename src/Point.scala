@@ -1,5 +1,4 @@
-import scala.annotation.tailrec
-import scala.io.Source
+
 
 case class Point private(x: Float, y: Float, z: Option[Float] = None) {}
 
@@ -25,25 +24,5 @@ object Point {
       ))
       case _ => None
     }
-  }
-
-  def read_csv(path : String, header: Boolean = false,sep: String = ",")(function: (String,String) => Option[Point])
-  : List[Option[Point]] ={
-    val source = Source.fromFile(path)
-    val fileContents = source.getLines.toList
-    source.close
-    val lines = (fileContents, header) match {
-      case (_,false) => fileContents
-      case (_::tail,_) => tail
-    }
-
-    @tailrec
-    def read_csv_aux(lines: List[String], function: (String,String) => Option[Point]
-                     , acc: List[Option[Point]] = Nil): List[Option[Point]] = lines match{
-      case Nil => acc
-      case h::t => read_csv_aux(t,function,function(h,sep)::acc)
-    }
-
-    read_csv_aux(lines, function).reverse
   }
 }

@@ -1,8 +1,8 @@
-import Point.{deserialization, read_csv}
+import Point.deserialization
 
 object Main {
   def main(args: Array[String]): Unit = {
-    val ListPoint = read_csv("./data/points.csv",header = true, ";")(deserialization)
+    val ListPoint = reader.csv("./data/points.csv",header = true, ";")(deserialization)
     println(ListPoint)
   }
 }
