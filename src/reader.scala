@@ -2,7 +2,7 @@ import scala.io.Source
 
 object reader {
   def csv[T](path : String, header: Boolean = false,sep: String = ",")
-            (function: (String,String) => Option[T]):List[Option[T]] = {
+            (function: (String,String) => Either[String,T]):List[Either[String,T]] = {
     val source = Source.fromFile(path)
     val fileContents = source.getLines.toList
     source.close
